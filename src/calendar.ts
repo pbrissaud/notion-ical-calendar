@@ -20,7 +20,14 @@ export function generateCalendar(events: CalendarEvent[]): ICalCalendar {
 		});
 
 		if (event.end) {
-			icalEvent.end(event.end);
+			if (event.allDay) {
+				// iCal DTEND is exclusive for all-day events, so add 1 day
+				const endDate = new Date(event.end);
+				endDate.setDate(endDate.getDate() + 1);
+				icalEvent.end(endDate);
+			} else {
+				icalEvent.end(event.end);
+			}
 		} else if (event.allDay) {
 			const endDate = new Date(event.start);
 			endDate.setDate(endDate.getDate() + 1);
