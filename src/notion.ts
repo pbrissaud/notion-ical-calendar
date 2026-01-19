@@ -25,6 +25,17 @@ function getPropertyValue(
 	return properties[name];
 }
 
+function findTitleProperty(
+	properties: PageObjectResponse["properties"],
+): PropertyValue | undefined {
+	for (const prop of Object.values(properties)) {
+		if (prop.type === "title") {
+			return prop;
+		}
+	}
+	return undefined;
+}
+
 function extractTitle(property: PropertyValue | undefined): string {
 	if (!property || property.type !== "title") {
 		return "Untitled";
@@ -70,7 +81,7 @@ function pageToEvent(
 	page: PageObjectResponse,
 	propertyNames: Config["propertyNames"],
 ): CalendarEvent | null {
-	const titleProp = getPropertyValue(page.properties, propertyNames.title);
+	const titleProp = findTitleProperty(page.properties);
 	const dateProp = getPropertyValue(page.properties, propertyNames.date);
 
 	const dateInfo = extractDate(dateProp);
