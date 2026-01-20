@@ -7,7 +7,7 @@
 	},
 	"files": {
 		"ignoreUnknown": false,
-		"ignore": ["dist", "node_modules", ".claude"]
+		"ignore": ["dist", "node_modules", ".claude", "renovate.json"]
 	},
 	"formatter": {
 		"enabled": true,
