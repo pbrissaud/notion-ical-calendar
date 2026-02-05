@@ -20,7 +20,7 @@ COPY src ./src
 RUN pnpm build
 
 # Stage 3: Production image
-FROM gcr.io/distroless/nodejs22-debian12@sha256:ccb87cd2aef8e20463d847a1eeaee12949b5c1213b5f4669a85c2989ad845402
+FROM gcr.io/distroless/nodejs22-debian12@sha256:61ac74f7ae19c65e87fdfcd5a0b0cb7172074ecbbbf0c26820ec5c09fd2ff9d1
 
 WORKDIR /app
 
