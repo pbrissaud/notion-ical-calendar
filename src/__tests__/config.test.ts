@@ -84,5 +84,25 @@ describe("config", () => {
 				"Environment variable PORT must be a number",
 			);
 		});
+
+		it("should read CALENDAR_TOKEN when set", () => {
+			process.env.NOTION_API_KEY = "test-api-key";
+			process.env.NOTION_DATABASE_ID = "test-database-id";
+			process.env.CALENDAR_TOKEN = "my-secret-token";
+
+			const config = loadConfig();
+
+			expect(config.calendarToken).toBe("my-secret-token");
+		});
+
+		it("should set calendarToken to null when CALENDAR_TOKEN is not set", () => {
+			process.env.NOTION_API_KEY = "test-api-key";
+			process.env.NOTION_DATABASE_ID = "test-database-id";
+			process.env.CALENDAR_TOKEN = undefined;
+
+			const config = loadConfig();
+
+			expect(config.calendarToken).toBeNull();
+		});
 	});
 });

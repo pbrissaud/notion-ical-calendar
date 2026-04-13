@@ -1,6 +1,7 @@
 export interface Config {
 	notionApiKey: string;
 	notionDatabaseId: string;
+	calendarToken: string | null;
 	port: number;
 	cacheTtl: number;
 	propertyNames: {
@@ -40,9 +41,17 @@ function getNumericEnv(name: string, defaultValue: number): number {
 }
 
 export function loadConfig(): Config {
+	const calendarToken = getOptionalEnvOrNull("CALENDAR_TOKEN");
+	if (!calendarToken) {
+		console.warn(
+			"[warn] CALENDAR_TOKEN is not set — the calendar feed is publicly accessible. Set CALENDAR_TOKEN to protect it.",
+		);
+	}
+
 	return {
 		notionApiKey: getRequiredEnv("NOTION_API_KEY"),
 		notionDatabaseId: getRequiredEnv("NOTION_DATABASE_ID"),
+		calendarToken,
 		port: getNumericEnv("PORT", 3000),
 		cacheTtl: getNumericEnv("CACHE_TTL", 300),
 		propertyNames: {

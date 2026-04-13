@@ -1,9 +1,14 @@
-import { Client } from "@notionhq/client";
 import type {
+	DatabaseObjectResponse,
 	PageObjectResponse,
-	QueryDatabaseResponse,
-} from "@notionhq/client/build/src/api-endpoints.js";
+	QueryDataSourceResponse,
+} from "@notionhq/client";
+import { Client } from "@notionhq/client";
 import type { Config } from "./config.js";
+
+const MAX_PAGES = 50; // ~5000 events max at page_size 100
+const MAX_LEN_TITLE = 500;
+const MAX_LEN_TEXT = 8000;
 
 export interface CalendarEvent {
 	id: string;
@@ -17,6 +22,10 @@ export interface CalendarEvent {
 }
 
 type PropertyValue = PageObjectResponse["properties"][string];
+
+function truncate(value: string, maxLen: number): string {
+	return value.length > maxLen ? value.slice(0, maxLen) : value;
+}
 
 function getPropertyValue(
 	properties: PageObjectResponse["properties"],
@@ -40,7 +49,8 @@ function extractTitle(property: PropertyValue | undefined): string {
 	if (!property || property.type !== "title") {
 		return "Untitled";
 	}
-	return property.title.map((t) => t.plain_text).join("") || "Untitled";
+	const raw = property.title.map((t) => t.plain_text).join("") || "Untitled";
+	return truncate(raw, MAX_LEN_TITLE);
 }
 
 function extractDate(property: PropertyValue | undefined): {
@@ -74,7 +84,7 @@ function extractRichText(property: PropertyValue | undefined): string | null {
 		return null;
 	}
 	const text = property.rich_text.map((t) => t.plain_text).join("");
-	return text || null;
+	return text ? truncate(text, MAX_LEN_TEXT) : null;
 }
 
 function pageToEvent(
@@ -120,6 +130,7 @@ export class NotionCalendarClient {
 	private client: Client;
 	private databaseId: string;
 	private propertyNames: Config["propertyNames"];
+	private dataSourceId: string | null = null;
 
 	constructor(config: Config) {
 		this.client = new Client({ auth: config.notionApiKey });
@@ -127,15 +138,37 @@ export class NotionCalendarClient {
 		this.propertyNames = config.propertyNames;
 	}
 
+	private async resolveDataSourceId(): Promise<string> {
+		if (this.dataSourceId) return this.dataSourceId;
+
+		const db = await this.client.databases.retrieve({
+			database_id: this.databaseId,
+		});
+
+		const fullDb = db as DatabaseObjectResponse;
+		const firstSource = fullDb.data_sources[0];
+		if (!firstSource) {
+			throw new Error(
+				`No data sources found for database ${this.databaseId}. Make sure the integration has access.`,
+			);
+		}
+
+		this.dataSourceId = firstSource.id;
+		return this.dataSourceId;
+	}
+
 	async fetchEvents(): Promise<CalendarEvent[]> {
+		const dataSourceId = await this.resolveDataSourceId();
 		const events: CalendarEvent[] = [];
-		let cursor: string | undefined = undefined;
+		let cursor: string | undefined;
+		let pageCount = 0;
 
 		do {
-			const response: QueryDatabaseResponse = await this.client.databases.query(
-				{
-					database_id: this.databaseId,
+			const response: QueryDataSourceResponse =
+				await this.client.dataSources.query({
+					data_source_id: dataSourceId,
 					start_cursor: cursor,
+					result_type: "page",
 					filter: {
 						property: this.propertyNames.date,
 						date: {
@@ -148,11 +181,12 @@ export class NotionCalendarClient {
 							direction: "ascending",
 						},
 					],
-				},
-			);
+				});
+
+			pageCount++;
 
 			for (const page of response.results) {
-				if ("properties" in page) {
+				if ("properties" in page && page.object === "page") {
 					const event = pageToEvent(
 						page as PageObjectResponse,
 						this.propertyNames,
@@ -161,6 +195,13 @@ export class NotionCalendarClient {
 						events.push(event);
 					}
 				}
+			}
+
+			if (pageCount >= MAX_PAGES && response.has_more) {
+				console.warn(
+					`[warn] Notion pagination limit reached (${MAX_PAGES} pages, ~${events.length} events). Results are truncated.`,
+				);
+				break;
 			}
 
 			cursor = response.has_more
