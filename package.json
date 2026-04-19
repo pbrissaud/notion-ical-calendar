@@ -30,7 +30,9 @@
 		"ical-generator": "^10.0.0"
 	},
 	"pnpm": {
-		"onlyBuiltDependencies": ["esbuild"]
+		"onlyBuiltDependencies": [
+			"esbuild"
+		]
 	},
 	"devDependencies": {
 		"@biomejs/biome": "^2.0.0",
