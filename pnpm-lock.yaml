@@ -13,7 +13,7 @@ importers:
         version: 5.18.0
       ical-generator:
         specifier: ^10.0.0
-        version: 10.1.0(@types/node@25.6.0)
+        version: 10.2.0(@types/node@25.6.0)
     devDependencies:
       '@biomejs/biome':
         specifier: ^2.4.11
@@ -489,8 +489,8 @@ packages:
   get-tsconfig@4.13.6:
     resolution: {integrity: sha512-shZT/QMiSHc/YBLxxOkMtgSid5HFoauqCE3/exfsEcwg1WkeqjG+V40yBbBrsD+jW2HDXcs28xOfcbm2jI8Ddw==}
 
-  ical-generator@10.1.0:
-    resolution: {integrity: sha512-VgWzox2svupw4HoZo9Ym0pmj50Cr7CO+By/TraNUVTXQL5Qh0p13iGNzizhXd/KDuzOHUSSXwUWIMZmBHQU65Q==}
+  ical-generator@10.2.0:
+    resolution: {integrity: sha512-XR5FsiDWCsz5MwBwMA/sQqR3A9H240xkXIeXOabV7uNAiieP+TA9rleVvlwPLRXMz+CXME8cGuDd7cdnE5At6w==}
     engines: {node: 20 || 22 || >=24}
     peerDependencies:
       '@touch4it/ical-timezones': '>=1.6.0'
@@ -1118,7 +1118,7 @@ snapshots:
     dependencies:
       resolve-pkg-maps: 1.0.0
 
-  ical-generator@10.1.0(@types/node@25.6.0):
+  ical-generator@10.2.0(@types/node@25.6.0):
     optionalDependencies:
       '@types/node': 25.6.0
 
