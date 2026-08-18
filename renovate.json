@@ -1,19 +1,31 @@
 {
-  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
-  "extends": [
-    "config:best-practices",
-    ":assignee(pbrissaud)",
-    ":reviewer(pbrissaud)",
-    "schedule:weekly"
-  ],
-  "lockFileMaintenance": {
-    "automerge": true
-  },
-  "patch": {
-    "automerge": true
-  },
-  "pin": {
-    "automerge": true
-  },
-  "separateMinorPatch": true
+	"$schema": "https://docs.renovatebot.com/renovate-schema.json",
+	"extends": [
+		"config:best-practices",
+		":assignee(pbrissaud)",
+		":reviewer(pbrissaud)",
+		"schedule:weekly"
+	],
+	"separateMinorPatch": true,
+	"automergeStrategy": "squash",
+	"lockFileMaintenance": {
+		"automerge": true
+	},
+	"patch": {
+		"automerge": true
+	},
+	"pin": {
+		"automerge": true
+	},
+	"digest": {
+		"automerge": true
+	},
+	"packageRules": [
+		{
+			"description": "Automerge all GitHub Actions updates, majors included",
+			"matchManagers": ["github-actions"],
+			"matchUpdateTypes": ["major", "minor", "patch", "digest", "pin"],
+			"automerge": true
+		}
+	]
 }
