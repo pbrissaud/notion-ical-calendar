@@ -2,19 +2,19 @@
 FROM node:24-alpine@sha256:d32cdf619f63fe0471182d08996dd516c6275bb5fd31ae06e55a570bd9e1ad43 AS deps
 WORKDIR /app
 
-RUN corepack enable && corepack prepare pnpm@10.7.0 --activate
+RUN corepack enable && corepack prepare pnpm@11.22.0 --activate
 
-COPY package.json pnpm-lock.yaml* ./
+COPY package.json pnpm-lock.yaml* pnpm-workspace.yaml ./
 RUN pnpm install --frozen-lockfile
 
 # Stage 2: Build TypeScript
 FROM node:24-alpine@sha256:d32cdf619f63fe0471182d08996dd516c6275bb5fd31ae06e55a570bd9e1ad43 AS builder
 WORKDIR /app
 
-RUN corepack enable && corepack prepare pnpm@10.7.0 --activate
+RUN corepack enable && corepack prepare pnpm@11.22.0 --activate
 
 COPY --from=deps /app/node_modules ./node_modules
-COPY package.json pnpm-lock.yaml* tsconfig.json ./
+COPY package.json pnpm-lock.yaml* pnpm-workspace.yaml tsconfig.json ./
 COPY src ./src
 
 RUN pnpm build
@@ -23,9 +23,9 @@ RUN pnpm build
 FROM node:24-alpine@sha256:d32cdf619f63fe0471182d08996dd516c6275bb5fd31ae06e55a570bd9e1ad43 AS prod-deps
 WORKDIR /app
 
-RUN corepack enable && corepack prepare pnpm@10.7.0 --activate
+RUN corepack enable && corepack prepare pnpm@11.22.0 --activate
 
-COPY package.json pnpm-lock.yaml* ./
+COPY package.json pnpm-lock.yaml* pnpm-workspace.yaml ./
 RUN pnpm install --frozen-lockfile --prod
 
 # Stage 4: Production image (distroless, non-root)
