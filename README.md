@@ -29,12 +29,31 @@ Your Notion database should have:
 |----------|----------|---------|-------------|
 | `NOTION_API_KEY` | Yes | - | Notion integration token |
 | `NOTION_DATABASE_ID` | Yes | - | Target database ID |
+| `CALENDAR_TOKEN` | No | - | Secret token to protect the feed URL (recommended) |
 | `PORT` | No | 3000 | HTTP server port |
 | `CACHE_TTL` | No | 300 | Cache duration in seconds |
 | `NOTION_PROPERTY_TITLE` | No | "Name" | Property name for event title |
 | `NOTION_PROPERTY_DATE` | No | "Date" | Property name for event date |
 | `NOTION_PROPERTY_DESCRIPTION` | No | - | Property name for description |
 | `NOTION_PROPERTY_LOCATION` | No | - | Property name for location |
+
+### Protecting the calendar feed
+
+Without `CALENDAR_TOKEN`, the feed is publicly accessible at `/calendar.ics` and a warning is logged at startup.
+
+When `CALENDAR_TOKEN` is set, the feed URL becomes `/calendar/<token>.ics`. Only requests with the exact token in the URL are served — all others return 404. The token is compared using a timing-safe function to prevent timing attacks.
+
+Generate a strong token with:
+
+```bash
+openssl rand -hex 32
+```
+
+Then subscribe to the protected URL:
+
+```
+http://your-server:3000/calendar/YOUR_TOKEN_HERE.ics
+```
 
 ## Development
 
@@ -62,7 +81,8 @@ pnpm start
 
 | Method | Path | Description |
 |--------|------|-------------|
-| GET | `/calendar.ics` | Returns the iCal feed |
+| GET | `/calendar.ics` | Returns the iCal feed (when `CALENDAR_TOKEN` is not set) |
+| GET | `/calendar/<token>.ics` | Returns the iCal feed (when `CALENDAR_TOKEN` is set) |
 | GET | `/health` | Health check (returns 200 OK) |
 
 ## Docker

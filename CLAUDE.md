@@ -36,12 +36,16 @@ The Notion database should contain:
 ### Environment Variables
 - `NOTION_API_KEY` - Notion integration token
 - `NOTION_DATABASE_ID` - ID of the calendar database
+- `CALENDAR_TOKEN` - Secret token to protect the feed URL (optional but recommended)
 - `PORT` - Server port (default: 3000)
 - `CACHE_TTL` - Cache duration in seconds (default: 300)
 - `NOTION_PROPERTY_TITLE` - Property name for event title (default: "Name")
 - `NOTION_PROPERTY_DATE` - Property name for event date (default: "Date")
 - `NOTION_PROPERTY_DESCRIPTION` - Property name for description (optional)
 - `NOTION_PROPERTY_LOCATION` - Property name for location (optional)
+
+### Calendar Feed URL Protection
+When `CALENDAR_TOKEN` is set, the feed URL changes from `/calendar.ics` to `/calendar/<token>.ics`. The token is validated via `timingSafeEqual` to prevent timing attacks. Without a token, a warning is logged and the feed is publicly accessible at `/calendar.ics`.
 
 ## Development Commands
 ```bash
