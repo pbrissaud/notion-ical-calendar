@@ -1,5 +1,5 @@
 # Stage 1: Install all dependencies (for build)
-FROM node:24-alpine@sha256:50c8e8ca1d27439048670df5883f32d57cf81cff6233222c893fd0d9884cbd81 AS deps
+FROM node:24-alpine@sha256:ebfe2f90462722a7a4de65e91990e97fe0d401c70e0e762c5b53302f905ec1c1 AS deps
 WORKDIR /app
 
 RUN corepack enable && corepack prepare pnpm@11.22.0 --activate
@@ -8,7 +8,7 @@ COPY package.json pnpm-lock.yaml* pnpm-workspace.yaml ./
 RUN pnpm install --frozen-lockfile
 
 # Stage 2: Build TypeScript
-FROM node:24-alpine@sha256:50c8e8ca1d27439048670df5883f32d57cf81cff6233222c893fd0d9884cbd81 AS builder
+FROM node:24-alpine@sha256:ebfe2f90462722a7a4de65e91990e97fe0d401c70e0e762c5b53302f905ec1c1 AS builder
 WORKDIR /app
 
 RUN corepack enable && corepack prepare pnpm@11.22.0 --activate
@@ -20,7 +20,7 @@ COPY src ./src
 RUN pnpm build
 
 # Stage 3: Install production-only dependencies
-FROM node:24-alpine@sha256:50c8e8ca1d27439048670df5883f32d57cf81cff6233222c893fd0d9884cbd81 AS prod-deps
+FROM node:24-alpine@sha256:ebfe2f90462722a7a4de65e91990e97fe0d401c70e0e762c5b53302f905ec1c1 AS prod-deps
 WORKDIR /app
 
 RUN corepack enable && corepack prepare pnpm@11.22.0 --activate
